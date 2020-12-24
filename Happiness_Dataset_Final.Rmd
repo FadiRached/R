@@ -1,0 +1,208 @@
+---
+title: "FinalProject"
+author: "Lucas Bell, Sam Marchand, and Fadi Rached"
+date: "11/5/2020"
+output: pdf_document
+---
+
+```{r}
+PATH<- 'C:/Users/bells/OneDrive/Documents/R/R home/2019.csv'
+Happy<- read.csv(PATH, header= T, sep=',')
+
+names(Happy)[names(Happy) == "Perceptions.of.corruption"] <- "Corruption"
+names(Happy)[names(Happy)== "Overall.rank"] <- "Rank"
+names(Happy)[names(Happy)== "Country.or.region"] <- "Country"
+names(Happy)[names(Happy)== "GDP.per.capita"] <- "GDP"
+names(Happy)[names(Happy)== "Healthy.life.expectancy"] <- "Life.expectancy"
+names(Happy)[names(Happy)== "Perception.of.corruption"] <- "Corruption"
+names(Happy)[names(Happy)== "Freedom.to.make.life.choices"] <- "Freedom"  
+str(Happy)
+```
+
+Question 1:
+
+```{r}
+attach(Happy)
+cor(GDP, Score)
+cor(Life.expectancy, Score)
+cor(Social.support, Score)
+cor(Freedom, Score)
+cor(Corruption, Score)
+cor(Generosity, Score)
+detach(Happy)
+```
+
+```{r}
+attach(Happy)
+library(partykit)
+score_tree = ctree(Score~ GDP + Life.expectancy + Corruption + Social.support + Freedom + Generosity, data=Happy)
+score_tree
+plot(score_tree)
+detach(Happy)
+```
+
+Answer.1:
+GDP per Capita has the strongest positive correlation with the overall Happiness Score. GDP per Capita is the most influential factor contributing to a country's happiness. We also see in the regression tree that GDP is the most influential factor. The correlation coefficient between GDP per Capita and Happiness Score is 0.7938829.The least significant factor we see is generosity. It is not influential enough to be demonstrated on the regression tree. The correlation coefficient between Happiness Score and Generosity is 0.07582369.
+
+
+Question 2:
+
+
+
+```{r}
+attach(Happy)
+cor(Life.expectancy, Score)
+cor(Social.support, Score)
+cor(Life.expectancy, Social.support)
+detach(Happy)
+```
+```{r}
+data1 = subset(Happy, Country!="Central African Republic")
+library(ggplot2)
+ggplot(data1, aes(x=Social.support, y= Score))+
+  geom_point(color="red")+
+  geom_smooth(color= "black")+
+  labs(
+    title= "Scatter Plot of Social Support vs. Happiness Score"
+  )
+```
+```{r}
+ggplot(Happy, aes(x=Life.expectancy, y= Score))+ 
+  geom_point(color="green")+
+  geom_smooth(color= "black")+
+  labs(
+    title= "Scatter Plot of Healthy Life Expectancy vs. Happiness Score"
+  )
+```
+```{r}
+data2 = subset(Happy, Country != "Central African Republic")
+data3= subset(data2, Country!= "Swaziland")
+ggplot(data3, aes(x=Life.expectancy, y = Social.support))+
+  geom_point(color= "blue")+
+  geom_smooth(color= "black")+
+  labs(
+    title= "Scatter Plot of Healthy Life Expectancy vs. Social Support"
+  )
+```
+```{r}
+attach(Happy)
+sstree = ctree(Social.support~ Life.expectancy + GDP + Freedom + Corruption + Generosity, data= Happy)
+plot(sstree)
+detach(Happy)
+```
+
+
+Answer.2:
+There is a strong positive correlation between Life Expectancy and Happiness Score, the correlation coefficient is 0.7798831. There is also a strong correlation between Social Support and Happiness Score, the correlation coefficient is 0.7770578. These correlation coefficients show that both Life Expectancy and Social Support positively affect a country's happiness in a similar way.  
+
+Question 3:
+```{r}
+attach(Happy)
+cor(GDP, Score)
+cor(Life.expectancy, Score)
+cor(Life.expectancy, GDP)
+detach(Happy)
+```
+
+```{r}
+ggplot(Happy, aes(x=GDP, y= Score))+
+  geom_point(color= "red")+
+  geom_smooth(color= "black")+
+  labs(
+    title= "Scatter Plot of GDP per Capita vs. Happiness Score"
+  )
+```
+```{r}
+data4= subset(Happy, Country!= "Swaziland")
+ggplot(data4, aes(x=Life.expectancy, y= GDP))+
+  geom_point(color= "blue")+
+  geom_smooth(color= "black")+
+  labs(
+    title= "Scatter Plot of Life Expectancy vs. GDP per Capita"
+  )
+```
+```{r}
+gdptree= ctree(GDP~ Social.support + Life.expectancy + Generosity + Corruption + Freedom, data= Happy)
+plot(gdptree)
+
+```
+
+
+Answer.3:
+Both GDP per Capita and Healthy Life Expectancy both have a strong positive affect on a country's happiness Score. GDP per Capita has a 0.7938829 correlation coefficient while healthy life expectancy has a 0.7798831 correlation coefficient. GDP per Capita and Healthy Life Expectancy also have a strong positive correlation. The correlation coefficient is 0.8354621. 
+
+
+
+Question 4:
+```{r}
+attach(Happy)
+cor(Corruption, Freedom)
+cor(Corruption, Score)
+cor(Freedom, Score)
+detach(Happy)
+```
+
+```{r}
+ggplot(Happy, aes(x= Freedom, y= Corruption))+
+  geom_point(color= "orange")+
+  geom_smooth(color= "black")+
+  labs(
+    title= "Scatter Plot of Freedom vs. Perception of Corruption"
+  )
+```
+```{r}
+data5= subset(Happy, Country!= "Rwanda")
+ggplot(data5, aes(x=Corruption, y= Score))+
+  geom_point(color= "purple")+
+  geom_smooth(color= "black")+
+  labs(
+    title= "Scatter Plot of Perception of Corruption vs. Happiness"
+  )
+```
+
+
+
+Answer.4:
+The correlation coefficient between Perception of Corruption and Freedom to make choices is 0.4388433. This is a weak positive correlation. We expected there to be a stronger negative correlation. Both variables still have a positive affect on a country's happiness.
+
+Question 5:
+```{r}
+Regions= c("North_Europe", "North_Europe", "NA", "NA", "North_Europe", "NA", "NA", "NA", "NA", "South_Europe", "NA", "NA", "NA", "NA", "North_Europe", "NA", "South_Europe", "NA", "North_America", "South_Europe", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "South_Europe", "NA", "NA", "South_America", "NA", "Asia", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "Middle_East", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "South_Europe", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "Africa", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "Asia", "NA", "Asia", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "South_America", "NA", "NA", "NA", "Africa", "NA", "NA", "NA", "Middle_East", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "Africa", "NA", "Middle_East", "Africa", "Africa", "Asia", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA")
+Happy= cbind(Regions, Happy)
+```
+
+
+```{r}
+attach(Happy)
+data6= subset(Happy, Regions!= "NA")
+box1 <- boxplot(Score~Regions, data=data6, xlab="Regions", ylab="Happiness Scores", 
+        cex.axis=0.5, col="blue", main = "Boxplots of different Regions vs. Happiness Score")
+detach(Happy)
+```
+```{r}
+boxplot(GDP~Region, data= data6, xlab = "Regions", ylab = "GDP per Capita", cex.axis= 0.4, col="red", main= "Boxplots of Regions and their GDP per Capita")
+```
+
+
+Ans: Among the 25 random countries selected to be put into their respective regions, we found that North Europe is the region with the highest average happiness score. While Africa is the region with the lowest happiness score.
+
+```{r}
+Government = c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "monarchy", "NA", "NA", "NA", "NA", "NA", "democracy", "monarchy", "NA", "democracy", "democracy", "NA", "republic", "monarchy", "NA", "NA", "NA", "democracy", "democracy", "NA", "NA", "monarchy", "NA", "NA", "NA", "NA", "NA", "republic", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "monarchy", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "totalitarianism", "democracy", "NA", "democracy", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "democracy", "NA", "NA", "NA", "NA", "NA", "totalitarianism", "NA", "NA", "NA", "NA", "NA", "democracy", "NA", "NA", "NA", "NA", "monarchy", "NA", "NA", "NA", "NA", "NA", "NA", "republic", "monarchy", "NA", "NA", "NA", "NA", "NA", "democracy", "NA", "NA", "monarchy", "NA", "NA", "NA", "NA", "democracy", "NA", "NA", "NA", "NA", "NA", "democracy", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "republic", "monarchy", "NA", "NA", "NA", "NA", "totalitarianism", "NA", "NA", "NA", "democracy", "NA", "NA", "totalitarianism")
+Happy= cbind(Government, Happy)
+```
+
+```{r}
+attach(Happy)
+data7= subset(Happy, Government != "NA")
+boxplot(Score~Government, data=data7, xlab="Types of Government", ylab="Happiness Scores",
+        cex.axis=0.9, col="green", main = "Boxplots of types of Government vs. Happiness Score")
+
+detach(Happy)
+```
+```{r}
+boxplot(Corruption~Government, data=data7, xlab= "Type of Government ", ylab= "Perception of Corruption", cex.axis= 0.9, col="yellow", main="Boxplots of Corruption vs. Type of Government")
+```
+
+Ans:
+Among a group of 30 nations, nations with a Republic have the lowest perception of corruption, whereas Monarchies have the highest perception of corruption. Countries with Totalitarian Governments have the lowest average happiness scores. Whereas, Countries with Democracies and Monarchies have the highest average happiness scores.
+
